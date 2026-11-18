@@ -26,7 +26,7 @@ cd tdm && bash install.sh
 tdm
 ```
 
-Features: aria2 segmented downloads (up to 16 connections per server), resumable transfers, faster yt-dlp fragment downloads (8 concurrent fragments), batch URL lists, queue, history, file listing, settings, VI/EN interface. Actual speed depends on the source server, network, and device.
+Features: aria2 segmented downloads (up to 16 connections per server), resumable transfers, batch URL lists, queue, history, file listing, settings, VI/EN interface. Menu 3 integrates the maintained TVDL script for YouTube, Facebook, Instagram, X (Twitter), and Xiaohongshu, including quality selection, playlists, audio-only downloads, video information, and login cookies. TVDL uses the shared TDM download folder on first integration. Actual speed and platform availability depend on the source service, network, and device.
 
 GitHub Pages hosts the bilingual project website only. The actual download manager runs locally on Android inside Termux.
 
