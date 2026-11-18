@@ -18,7 +18,7 @@ msg() {
 pause() { read -r -p "$( [[ "$LANG_CODE" == "en" ]] && echo 'Press Enter to continue...' || echo 'Nhấn Enter để tiếp tục...' )"; }
 
 latest_commit() {
-  git ls-remote "$REPO" "refs/heads/$BRANCH" | awk 'NR==1 {print $1}'
+  git ls-remote "$REPO" "refs/heads/$BRANCH" 2>/dev/null | awk 'NR==1 {print $1}' || true
 }
 
 installed_commit() {
