@@ -38,14 +38,14 @@ download(){ local url="$1" rc=0; mkdir -p "$DOWNLOAD_DIR"; if command -v aria2c 
 while true; do
  clear 2>/dev/null || true
  printf '\033[1;36m'; cat <<'ART'
- _____ ____  ____
-|_   _|  _ \|  _ \
-  | | | | | | |_) |
-  | | | |_| |  __/
-  |_| |____/|_|
+ _____  ____  __  __
+|_   _||  _ \|  \/  |
+  | |  | | | | |\/| |
+  | |  | |_| | |  | |
+  |_|  |____/|_|  |_|
 ART
  printf '\033[0m%s\n' "$(t title)" "--------------------------------"
- printf '1) %s\n2) %s\n3) %s\n4) %s\n5) %s\n6) %s\n7) %s\n8) %s\n9) %s\n10) %s\n0) %s\n' "$(t one)" "$(t batch)" "$(t video)" "$(t tasks)" "$(t history)" "$(t files)" "$(t queue)" "$(t settings)" "$(t language)" "$(t update)" "$(t exit)"
+ printf '1) %s\n2) %s\n3) %s\n4) %s\n5) %s\n6) %s\n7) %s\n8) %s\n9) %s\n10) %s\n11) %s\n0) %s\n' "$(t one)" "$(t batch)" "$(t video)" "$(t tasks)" "$(t history)" "$(t files)" "$(t queue)" "$(t settings)" "$(t language)" "$(t update)" "$(t uninstall)" "$(t exit)"
  read -r -p "> " c
  case "$c" in
  1) if get_url; then download "$URL"; fi; pause;;
@@ -63,7 +63,8 @@ RETRIES=$RETRIES
 EOF
  pause;;
  9) echo "1) Tiếng Việt  2) English"; read -r -p "> " l; case "$l" in 1) LANG_CODE=vi;; 2) LANG_CODE=en;; esac; sed -i "s/^LANG=.*/LANG=$LANG_CODE/" "$CFG";;
- 10) "$HOME/.local/share/tdm/update.sh"; pause;;
+ 10) updater="$HOME/.local/share/tdm/update.sh"; tmp_updater="$(mktemp)"; if curl -fsSL "https://raw.githubusercontent.com/khahdihdz/tdm/main/update.sh" -o "$tmp_updater"; then install -m 700 "$tmp_updater" "$updater"; rm -f "$tmp_updater"; bash "$updater"; else rm -f "$tmp_updater"; echo "Không tải được trình cập nhật. Kiểm tra Internet."; pause; fi;;
+ 11) bash "$HOME/.local/share/tdm/uninstall.sh"; exit 0;;
  0) exit 0;;
  *) echo "Invalid"; sleep 1;;
  esac
