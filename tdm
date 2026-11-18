@@ -7,11 +7,22 @@ LANG_CODE=vi; DOWNLOAD_DIR="$HOME/storage/downloads/tdm"; SPLIT=8; RETRIES=5
 while IFS='=' read -r k v; do case "$k" in LANG) LANG_CODE="$v";; DOWNLOAD_DIR) DOWNLOAD_DIR="$v";; SPLIT) SPLIT="$v";; RETRIES) RETRIES="$v";; esac; done < "$CFG"
 # Migrate the previous default while preserving user-selected directories.
 if [ "$DOWNLOAD_DIR" = "$HOME/downloads" ]; then DOWNLOAD_DIR="$HOME/storage/downloads/tdm"; fi
+# Ensure Android shared storage is linked; request permission when needed.
 if [ ! -d "$HOME/storage/downloads" ]; then
-  echo "Android shared storage is not ready. Run: termux-setup-storage"
+  if command -v termux-setup-storage >/dev/null 2>&1; then
+    echo "Requesting Android storage access..."
+    termux-setup-storage
+  fi
+fi
+if [ ! -d "$HOME/storage/downloads" ]; then
+  echo "Cannot access Android Downloads. Grant storage permission, then restart TDM."
   exit 1
 fi
-mkdir -p "$DOWNLOAD_DIR"
+# Always create the configured download directory if it is missing.
+if ! mkdir -p "$DOWNLOAD_DIR"; then
+  echo "Cannot create download directory: $DOWNLOAD_DIR"
+  exit 1
+fi
 # Persist the migrated/default path for the next launch.
 if ! grep -q "^DOWNLOAD_DIR=" "$CFG" || grep -q "^DOWNLOAD_DIR=$HOME/downloads$" "$CFG"; then
   sed -i "s|^DOWNLOAD_DIR=.*|DOWNLOAD_DIR=$DOWNLOAD_DIR|" "$CFG"
