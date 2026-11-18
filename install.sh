@@ -17,6 +17,6 @@ cat > "$PREFIX/bin/tdm" <<'EOF'
 exec "$HOME/.local/share/tdm/tdm" "$@"
 EOF
 chmod 755 "$PREFIX/bin/tdm"
-[ -f "$HOME/.config/tdm/config" ] || printf 'LANG=vi\nDOWNLOAD_DIR=%s\nSPLIT=8\nRETRIES=5\n' "$HOME/downloads" > "$HOME/.config/tdm/config"
+[ -f "$HOME/.config/tdm/config" ] || printf 'LANG=vi\nDOWNLOAD_DIR=%s\nSPLIT=8\nRETRIES=5\n' "$HOME/storage/downloads/tdm" > "$HOME/.config/tdm/config"
 echo "TDM installed. Run: tdm"
 echo "If needed, run: termux-setup-storage"
