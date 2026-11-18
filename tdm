@@ -23,7 +23,7 @@ vi:url) echo "Nhập URL:";; en:url) echo "Enter URL:";;
 *) echo "$1";; esac; }
 pause(){ read -r -p "Enter..."; }
 get_url(){ read -r -p "$(t url) " URL; [[ "$URL" =~ ^(https?|ftp):// ]] || { echo "Invalid URL"; return 1; }; }
-download(){ local url="$1"; mkdir -p "$DOWNLOAD_DIR"; if command -v aria2c >/dev/null; then aria2c -c -x "$SPLIT" -s "$SPLIT" --max-tries="$RETRIES" -d "$DOWNLOAD_DIR" "$url"; else curl -fL -C - --retry "$RETRIES" -O "$url"; fi; rc=$?; printf '%s\t%s\t%s\n' "$(date -Iseconds)" "$url" "$rc" >> "$HIST"; return "$rc"; }
+download(){ local url="$1" rc=0; mkdir -p "$DOWNLOAD_DIR"; if command -v aria2c >/dev/null; then aria2c -c -x "$SPLIT" -s "$SPLIT" --max-tries="$RETRIES" -d "$DOWNLOAD_DIR" "$url" || rc=$?; else (cd "$DOWNLOAD_DIR" && curl -fL -C - --retry "$RETRIES" -O "$url") || rc=$?; fi; printf '%s\t%s\t%s\n' "$(date -Iseconds)" "$url" "$rc" >> "$HIST"; return "$rc"; }
 while true; do
  clear 2>/dev/null || true
  printf '\033[1;36m'; cat <<'ART'
@@ -34,7 +34,7 @@ while true; do
   |_| |____/|_|
 ART
  printf '\033[0m%s\n' "$(t title)" "--------------------------------"
- printf '1) %s\n2) %s\n3) %s\n4) %s\n5) %s\n6) %s\n7) %s\n8) %s\n9) %s\n0) %s\n' "$(t one)" "$(t batch)" "$(t video)" "$(t tasks)" "$(t history)" "$(t files)" "$(t queue)" "$(t settings)" "$(t language)" "$(t update)" "$(t exit)"
+ printf '1) %s\n2) %s\n3) %s\n4) %s\n5) %s\n6) %s\n7) %s\n8) %s\n9) %s\n10) %s\n0) %s\n' "$(t one)" "$(t batch)" "$(t video)" "$(t tasks)" "$(t history)" "$(t files)" "$(t queue)" "$(t settings)" "$(t language)" "$(t update)" "$(t exit)"
  read -r -p "> " c
  case "$c" in
  1) if get_url; then download "$URL"; fi; pause;;
