@@ -33,7 +33,7 @@ t(){ case "$LANG_CODE:$1" in
 vi:title) echo "TDM - QUẢN LÝ TẢI XUỐNG";; en:title) echo "TDM - DOWNLOAD MANAGER";;
 vi:one) echo "Tải một URL";; en:one) echo "Download one URL";;
 vi:batch) echo "Tải danh sách URL";; en:batch) echo "Download URL list";;
-vi:video) echo "Tải video/audio (yt-dlp)";; en:video) echo "Download video/audio (yt-dlp)";;
+vi:video) echo "Tải đa nền tảng (TVDL)";; en:video) echo "Multi-platform downloader (TVDL)";;
 vi:tasks) echo "Tiến trình tải";; en:tasks) echo "Download processes";;
 vi:history) echo "Lịch sử";; en:history) echo "History";;
 vi:files) echo "Quản lý tệp";; en:files) echo "File manager";;
@@ -68,7 +68,34 @@ ART
  case "$c" in
  1) if get_url; then download "$URL"; fi; pause;;
  2) read -r -p "TXT file: " f; if [ -f "$f" ]; then while IFS= read -r u; do [[ "$u" =~ ^(https?|ftp):// ]] && download "$u"; done < "$f"; else echo "File not found"; fi; pause;;
- 3) command -v yt-dlp >/dev/null || pkg install -y yt-dlp ffmpeg; get_url && yt-dlp --concurrent-fragments 8 -N 8 --retries "$RETRIES" --fragment-retries "$RETRIES" -P "$DOWNLOAD_DIR" "$URL"; pause;;
+ 3)
+    helper="$HOME/.local/share/tdm/tvdl.sh"
+    tmp_helper="$(mktemp)"
+    mkdir -p "$(dirname "$helper")"
+    if curl -fsSL --retry 2 "https://raw.githubusercontent.com/khahdihdz/tvdl/main/tvdl.sh" -o "$tmp_helper"; then
+      if bash -n "$tmp_helper"; then
+        install -m 700 "$tmp_helper" "$helper"
+      else
+        echo "TVDL source has a syntax error; keeping cached copy."
+      fi
+    elif [ -s "$helper" ]; then
+      echo "Cannot reach GitHub; using cached TVDL."
+    else
+      echo "Cannot download TVDL. Check your Internet connection."
+      rm -f "$tmp_helper"
+      pause
+      continue
+    fi
+    rm -f "$tmp_helper"
+    if [ ! -s "$helper" ]; then echo "TVDL is unavailable."; pause; continue; fi
+    tvdl_cfg="$HOME/.config/termux-video-downloader/config.conf"
+    if [ ! -f "$tvdl_cfg" ]; then
+      mkdir -p "$(dirname "$tvdl_cfg")"
+      printf 'DOWNLOAD_DIR=%q\\nDEFAULT_FORMAT=mp4\\nDEFAULT_QUALITY=1\\nAUDIO_FORMAT=mp3\\nCOLOR=1\\n' "$DOWNLOAD_DIR" > "$tvdl_cfg"
+    fi
+    bash "$helper"
+    pause;;
+
  4) pgrep -af 'aria2c|yt-dlp|curl|wget' || true; pause;;
  5) cat "$HIST" 2>/dev/null || echo "Empty"; pause;;
  6) ls -lah "$DOWNLOAD_DIR"; pause;;
