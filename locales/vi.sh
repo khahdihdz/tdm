@@ -1,0 +1,7 @@
+TDM_LOCALE_NAME="Tiếng Việt"
+TDM_MENU_DOWNLOAD="Tải xuống"
+TDM_MENU_BATCH="Tải hàng loạt"
+TDM_MENU_VIDEO="Tải video/audio"
+TDM_MENU_HISTORY="Lịch sử"
+TDM_MENU_FILES="Quản lý tệp"
+TDM_MENU_SETTINGS="Cài đặt"
