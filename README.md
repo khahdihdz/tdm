@@ -9,7 +9,7 @@ Open Termux and run:
 pkg update -y && pkg install -y curl && curl -fsSL https://raw.githubusercontent.com/khahdihdz/tdm/main/install.sh | bash
 ```
 
-After installation, start TDM with:
+TDM tự tạo thư mục tải xuống mặc định tại `~/downloads` khi cài đặt và mỗi lần khởi chạy. Bạn có thể đổi thư mục trong mục Cài đặt.\n\nAfter installation, start TDM with:
 
 ```bash
 tdm
