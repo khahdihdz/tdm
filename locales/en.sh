@@ -1,0 +1,7 @@
+TDM_LOCALE_NAME="English"
+TDM_MENU_DOWNLOAD="Download"
+TDM_MENU_BATCH="Batch download"
+TDM_MENU_VIDEO="Video/audio download"
+TDM_MENU_HISTORY="History"
+TDM_MENU_FILES="File manager"
+TDM_MENU_SETTINGS="Settings"
