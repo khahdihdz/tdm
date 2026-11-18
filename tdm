@@ -18,6 +18,7 @@ vi:queue) echo "Hàng đợi";; en:queue) echo "Queue";;
 vi:settings) echo "Cài đặt";; en:settings) echo "Settings";;
 vi:language) echo "Ngôn ngữ";; en:language) echo "Language";;
 vi:update) echo "Cập nhật";; en:update) echo "Update";;
+vi:uninstall) echo "Gỡ cài đặt TDM";; en:uninstall) echo "Uninstall TDM";;
 vi:exit) echo "Thoát";; en:exit) echo "Exit";;
 vi:url) echo "Nhập URL:";; en:url) echo "Enter URL:";;
 *) echo "$1";; esac; }
