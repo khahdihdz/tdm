@@ -2,8 +2,8 @@
 set -uo pipefail
 CFG="$HOME/.config/tdm/config"; HIST="$HOME/.local/share/tdm/history.tsv"
 mkdir -p "$(dirname "$CFG")" "$(dirname "$HIST")"
-[ -f "$CFG" ] || printf 'LANG=vi\nDOWNLOAD_DIR=%s\nSPLIT=8\nRETRIES=5\n' "$HOME/storage/downloads/tdm" > "$CFG"
-LANG_CODE=vi; DOWNLOAD_DIR="$HOME/storage/downloads/tdm"; SPLIT=8; RETRIES=5
+[ -f "$CFG" ] || printf 'LANG=vi\nDOWNLOAD_DIR=%s\nSPLIT=16\nRETRIES=5\n' "$HOME/storage/downloads/tdm" > "$CFG"
+LANG_CODE=vi; DOWNLOAD_DIR="$HOME/storage/downloads/tdm"; SPLIT=16; RETRIES=5
 while IFS='=' read -r k v; do case "$k" in LANG) LANG_CODE="$v";; DOWNLOAD_DIR) DOWNLOAD_DIR="$v";; SPLIT) SPLIT="$v";; RETRIES) RETRIES="$v";; esac; done < "$CFG"
 # Migrate the previous default while preserving user-selected directories.
 if [ "$DOWNLOAD_DIR" = "$HOME/downloads" ]; then DOWNLOAD_DIR="$HOME/storage/downloads/tdm"; fi
@@ -45,7 +45,12 @@ vi:url) echo "Nhập URL:";; en:url) echo "Enter URL:";;
 *) echo "$1";; esac; }
 pause(){ read -r -p "Enter..."; }
 get_url(){ read -r -p "$(t url) " URL; [[ "$URL" =~ ^(https?|ftp):// ]] || { echo "Invalid URL"; return 1; }; }
-download(){ local url="$1" rc=0; mkdir -p "$DOWNLOAD_DIR"; if command -v aria2c >/dev/null; then aria2c -c -x "$SPLIT" -s "$SPLIT" --max-tries="$RETRIES" -d "$DOWNLOAD_DIR" "$url" || rc=$?; else (cd "$DOWNLOAD_DIR" && curl -fL -C - --retry "$RETRIES" -O "$url") || rc=$?; fi; printf '%s\t%s\t%s\n' "$(date -Iseconds)" "$url" "$rc" >> "$HIST"; return "$rc"; }
+download(){ local url="$1" rc=0; mkdir -p "$DOWNLOAD_DIR"; if command -v aria2c >/dev/null; then
+  aria2c --continue=true --max-connection-per-server="$SPLIT" --split="$SPLIT" --min-split-size=1M --max-tries="$RETRIES" --retry-wait=2 --connect-timeout=15 --timeout=60 --file-allocation=none --summary-interval=1 --dir="$DOWNLOAD_DIR" "$url" || rc=$?
+ else
+  echo "aria2c is not installed; curl fallback uses a single connection. Install with: pkg install aria2"
+  (cd "$DOWNLOAD_DIR" && curl -fL -C - --retry "$RETRIES" --retry-delay 2 --connect-timeout 15 --max-time 0 -O "$url") || rc=$?
+ fi; printf '%s\t%s\t%s\n' "$(date -Iseconds)" "$url" "$rc" >> "$HIST"; return "$rc"; }
 while true; do
  clear 2>/dev/null || true
  printf '\033[1;36m'; cat <<'ART'
@@ -61,12 +66,12 @@ ART
  case "$c" in
  1) if get_url; then download "$URL"; fi; pause;;
  2) read -r -p "TXT file: " f; if [ -f "$f" ]; then while IFS= read -r u; do [[ "$u" =~ ^(https?|ftp):// ]] && download "$u"; done < "$f"; else echo "File not found"; fi; pause;;
- 3) command -v yt-dlp >/dev/null || pkg install -y yt-dlp ffmpeg; get_url && yt-dlp -P "$DOWNLOAD_DIR" "$URL"; pause;;
+ 3) command -v yt-dlp >/dev/null || pkg install -y yt-dlp ffmpeg; get_url && yt-dlp --concurrent-fragments 8 -N 8 --retries "$RETRIES" --fragment-retries "$RETRIES" -P "$DOWNLOAD_DIR" "$URL"; pause;;
  4) pgrep -af 'aria2c|yt-dlp|curl|wget' || true; pause;;
  5) cat "$HIST" 2>/dev/null || echo "Empty"; pause;;
  6) ls -lah "$DOWNLOAD_DIR"; pause;;
  7) read -r -p "URL: " u; [[ "$u" =~ ^(https?|ftp):// ]] && echo "$u" >> "$HOME/.local/share/tdm/queue.txt"; echo "Queued. Use batch list to process queue."; pause;;
- 8) echo "Current directory: $DOWNLOAD_DIR"; read -r -p "New directory (blank=keep): " d; [ -n "$d" ] && DOWNLOAD_DIR="$d"; read -r -p "Connections (1-16): " n; [[ "$n" =~ ^([1-9]|1[0-6])$ ]] && SPLIT="$n"; cat > "$CFG" <<EOF
+ 8) echo "Current directory: $DOWNLOAD_DIR"; echo "aria2 mode: up to 16 connections per server; actual speed depends on server/network."; read -r -p "New directory (blank=keep): " d; [ -n "$d" ] && DOWNLOAD_DIR="$d"; read -r -p "Connections (1-16, recommended 16): " n; [[ "$n" =~ ^([1-9]|1[0-6])$ ]] && SPLIT="$n"; cat > "$CFG" <<EOF
 LANG=$LANG_CODE
 DOWNLOAD_DIR=$DOWNLOAD_DIR
 SPLIT=$SPLIT
