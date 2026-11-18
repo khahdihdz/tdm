@@ -74,7 +74,7 @@ ART
     mkdir -p "$(dirname "$helper")"
 
     # Always request a fresh upstream copy; the query avoids stale CDN cache.
-    tvdl_url="https://raw.githubusercontent.com/khahdihdz/tvdl/main/tvdl.sh?tdm_refresh=rednote1"
+    tvdl_url="https://raw.githubusercontent.com/khahdihdz/tvdl/main/tvdl.sh?tdm_refresh=rednote2"
     if curl -fsSL --retry 2 "$tvdl_url" -o "$tmp_helper"; then
       if ! bash -n "$tmp_helper"; then
         echo "TVDL source has a syntax error; keeping cached copy."
