@@ -91,7 +91,7 @@ ART
     tvdl_cfg="$HOME/.config/termux-video-downloader/config.conf"
     if [ ! -f "$tvdl_cfg" ]; then
       mkdir -p "$(dirname "$tvdl_cfg")"
-      printf 'DOWNLOAD_DIR=%q\\nDEFAULT_FORMAT=mp4\\nDEFAULT_QUALITY=1\\nAUDIO_FORMAT=mp3\\nCOLOR=1\\n' "$DOWNLOAD_DIR" > "$tvdl_cfg"
+      printf 'DOWNLOAD_DIR=%q\nDEFAULT_FORMAT=mp4\nDEFAULT_QUALITY=1\nAUDIO_FORMAT=mp3\nCOLOR=1\n' "$DOWNLOAD_DIR" > "$tvdl_cfg"
     fi
     bash "$helper"
     pause;;
