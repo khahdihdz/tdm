@@ -72,26 +72,74 @@ ART
     helper="$HOME/.local/share/tdm/tvdl.sh"
     tmp_helper="$(mktemp)"
     mkdir -p "$(dirname "$helper")"
-    if curl -fsSL --retry 2 "https://raw.githubusercontent.com/khahdihdz/tvdl/main/tvdl.sh" -o "$tmp_helper"; then
-      if bash -n "$tmp_helper"; then
-        install -m 700 "$tmp_helper" "$helper"
-      else
+
+    # Always request a fresh upstream copy; the query avoids stale CDN cache.
+    tvdl_url="https://raw.githubusercontent.com/khahdihdz/tvdl/main/tvdl.sh?tdm_refresh=rednote1"
+    if curl -fsSL --retry 2 "$tvdl_url" -o "$tmp_helper"; then
+      if ! bash -n "$tmp_helper"; then
         echo "TVDL source has a syntax error; keeping cached copy."
+        rm -f "$tmp_helper"
+      else
+        install -m 700 "$tmp_helper" "$helper"
+        rm -f "$tmp_helper"
       fi
-    elif [ -s "$helper" ]; then
-      echo "Cannot reach GitHub; using cached TVDL."
     else
-      echo "Cannot download TVDL. Check your Internet connection."
       rm -f "$tmp_helper"
-      pause
-      continue
+      if [ -s "$helper" ]; then
+        echo "Cannot reach GitHub; using cached TVDL."
+      else
+        echo "Cannot download TVDL. Check your Internet connection."
+        pause
+        continue
+      fi
     fi
-    rm -f "$tmp_helper"
+
+    # Compatibility guard for older cached TVDL copies: accept RedNote
+    # share redirects and normalize them to the Xiaohongshu extractor host.
+    if ! grep -q 'rednote.com' "$helper"; then
+      python3 - "$helper" <<'PYTVCOMPAT'
+import pathlib
+import sys
+
+path = pathlib.Path(sys.argv[1])
+source = path.read_text(encoding="utf-8")
+old_block = """parts = urlsplit(url)
+host = parts.netloc.lower()
+if not host.endswith("xiaohongshu.com"):
+    print(url)
+    sys.exit(0)
+
+if not host.startswith("www."):
+    host = "www." + host.lstrip(".")
+"""
+new_block = """parts = urlsplit(url)
+host = (parts.hostname or "").lower()
+if host == "rednote.com" or host.endswith(".rednote.com"):
+    host = "www.xiaohongshu.com"
+elif host == "xiaohongshu.com" or host.endswith(".xiaohongshu.com"):
+    host = "www.xiaohongshu.com"
+else:
+    print(url)
+    sys.exit(0)
+"""
+if old_block not in source:
+    print("Cached TVDL needs manual refresh; RedNote compatibility patch not applied.", file=sys.stderr)
+    sys.exit(2)
+path.write_text(source.replace(old_block, new_block, 1), encoding="utf-8")
+PYTVCOMPAT
+      if [ "$?" -ne 0 ]; then
+        echo "TVDL cache is outdated and could not be patched. Please retry with Internet."
+        pause
+        continue
+      fi
+      chmod 700 "$helper"
+    fi
+
     if [ ! -s "$helper" ]; then echo "TVDL is unavailable."; pause; continue; fi
     tvdl_cfg="$HOME/.config/termux-video-downloader/config.conf"
     if [ ! -f "$tvdl_cfg" ]; then
       mkdir -p "$(dirname "$tvdl_cfg")"
-      printf 'DOWNLOAD_DIR=%q\nDEFAULT_FORMAT=mp4\nDEFAULT_QUALITY=1\nAUDIO_FORMAT=mp3\nCOLOR=1\n' "$DOWNLOAD_DIR" > "$tvdl_cfg"
+      printf 'DOWNLOAD_DIR=%q\\nDEFAULT_FORMAT=mp4\\nDEFAULT_QUALITY=1\\nAUDIO_FORMAT=mp3\\nCOLOR=1\\n' "$DOWNLOAD_DIR" > "$tvdl_cfg"
     fi
     bash "$helper"
     pause;;
