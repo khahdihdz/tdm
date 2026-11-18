@@ -26,7 +26,7 @@ cd tdm && bash install.sh
 tdm
 ```
 
-Features: aria2/curl/wget, resumable downloads, batch URL lists, yt-dlp media downloads, queue, history, file listing, settings, VI/EN interface.
+Features: aria2 segmented downloads (up to 16 connections per server), resumable transfers, faster yt-dlp fragment downloads (8 concurrent fragments), batch URL lists, queue, history, file listing, settings, VI/EN interface. Actual speed depends on the source server, network, and device.
 
 GitHub Pages hosts the bilingual project website only. The actual download manager runs locally on Android inside Termux.
 
