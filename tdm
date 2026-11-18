@@ -5,6 +5,8 @@ mkdir -p "$(dirname "$CFG")" "$(dirname "$HIST")"
 [ -f "$CFG" ] || printf 'LANG=vi\nDOWNLOAD_DIR=%s\nSPLIT=16\nRETRIES=5\n' "$HOME/storage/downloads/tdm" > "$CFG"
 LANG_CODE=vi; DOWNLOAD_DIR="$HOME/storage/downloads/tdm"; SPLIT=16; RETRIES=5
 while IFS='=' read -r k v; do case "$k" in LANG) LANG_CODE="$v";; DOWNLOAD_DIR) DOWNLOAD_DIR="$v";; SPLIT) SPLIT="$v";; RETRIES) RETRIES="$v";; esac; done < "$CFG"
+# Upgrade the previous default connection count to the high-speed preset.
+if [ "$SPLIT" = "8" ]; then SPLIT=16; fi
 # Migrate the previous default while preserving user-selected directories.
 if [ "$DOWNLOAD_DIR" = "$HOME/downloads" ]; then DOWNLOAD_DIR="$HOME/storage/downloads/tdm"; fi
 # Ensure Android shared storage is linked; request permission when needed.
