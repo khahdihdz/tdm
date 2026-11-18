@@ -4,7 +4,12 @@ set -Eeuo pipefail
 pkg update -y
 pkg install -y bash curl wget aria2 git
 APP="$HOME/.local/share/tdm"
-mkdir -p "$APP" "$HOME/.config/tdm" "$HOME/downloads"
+termux-setup-storage
+if [ ! -d "$HOME/storage/downloads" ]; then
+  echo "Shared Downloads folder is unavailable. Grant storage permission and run termux-setup-storage again."
+  exit 1
+fi
+mkdir -p "$APP" "$HOME/.config/tdm" "$HOME/storage/downloads/tdm"
 if [ -f tdm ]; then cp -R . "$APP/"; else git clone --depth 1 https://github.com/khahdihdz/tdm.git "$APP"; fi
 chmod +x "$APP/tdm" "$APP/update.sh" "$APP/uninstall.sh"
 cat > "$PREFIX/bin/tdm" <<'EOF'
