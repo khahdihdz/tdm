@@ -10,9 +10,6 @@
 <article class="card"><h3>📦 Queue & History</h3><p data-vi="Hàng đợi URL, lịch sử và quản lý thư mục tải." data-en="URL queue, download history and destination management.">Hàng đợi URL, lịch sử và quản lý thư mục tải.</p></article>
 <article class="card"><h3>🎬 yt-dlp</h3><p data-vi="Tùy chọn tải media bằng yt-dlp và ffmpeg." data-en="Optional media downloads with yt-dlp and ffmpeg.">Tùy chọn tải media bằng yt-dlp và ffmpeg.</p></article>
 <article class="card"><h3>🌐 VI / EN</h3><p data-vi="Giao diện song ngữ trong Terminal và website." data-en="Bilingual interface in the terminal and website.">Giao diện song ngữ trong Terminal và website.</p></article></section>
-<h2 data-vi="Cài đặt nhanh" data-en="Quick install">Cài đặt nhanh</h2><pre>pkg update -y && pkg install -y git
-git clone https://github.com/khahdihdz/tdm.git
-cd tdm && bash install.sh
-tdm</pre>
+<h2 data-vi="Cài đặt một lệnh" data-en="One-command install">Cài đặt một lệnh</h2><p data-vi="Mở Termux và chạy lệnh sau:" data-en="Open Termux and run this command:">Mở Termux và chạy lệnh sau:</p><pre>pkg update -y && pkg install -y curl && curl -fsSL https://raw.githubusercontent.com/khahdihdz/tdm/main/install.sh | bash</pre><p data-vi="Sau khi cài đặt, khởi chạy bằng lệnh:" data-en="After installation, launch with:">Sau khi cài đặt, khởi chạy bằng lệnh:</p><pre>tdm</pre>
 <p><small data-vi="GitHub Pages chỉ lưu website tài liệu. Download Manager chạy trực tiếp trong Termux." data-en="GitHub Pages hosts documentation only. The manager runs locally in Termux.">GitHub Pages chỉ lưu website tài liệu. Download Manager chạy trực tiếp trong Termux.</small></p><footer>MIT License · <a href="https://github.com/khahdihdz/tdm">khahdihdz/tdm</a></footer></main>
 <script>const b=document.getElementById('lang');let l=localStorage.getItem('tdm-lang')||'vi';function apply(){document.documentElement.lang=l;document.querySelectorAll('[data-vi]').forEach(e=>e.textContent=e.dataset[l]||e.dataset.vi);b.textContent=l==='vi'?'English':'Tiếng Việt'}b.onclick=()=>{l=l==='vi'?'en':'vi';localStorage.setItem('tdm-lang',l);apply()};apply();</script></body></html>
